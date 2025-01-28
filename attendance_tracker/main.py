@@ -81,7 +81,7 @@ def main():
             # Check if the file exists
             if not files:
                 print('No files found please add excel files to the Attendance_Sheets folder')
-                delay = input('Press any key to exit')
+                delay = input('Press The Enter Key to exit the program')
                 sys.exit()
 
             print('Available files:')
