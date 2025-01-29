@@ -65,6 +65,10 @@ def main():
             
             if choice3 == '2':
                 eventnames = list(set(student.eventname for student in students.values()))
+                if not eventnames:
+                    print('No Events found please add an event')
+                    continue
+
                 print('Existing event names:')
                 for idx, event in enumerate(eventnames):
                     print(f"{idx + 1}: {event}")
@@ -122,14 +126,17 @@ def main():
         elif choice2 == '2':
             students = load_students(students_file)
             eventnames = list(set(student.eventname for student in students.values()))
+            if not eventnames:
+                    print('No Events found please add an event')
+                    continue
             print('Existing event names:')
             for idx, event in enumerate(eventnames):
                 print(f"{idx + 1}: {event}")
             event_choice = int(input('Select an event by number: ')) - 1
 
             if event_choice < 0 or event_choice >= len(eventnames):
-                print('Invalid choice')
-
+                print('Invalid choice please select an existing event or create a new one')
+                continue
             eventname = eventnames[event_choice]
             tally1 = int(input('Enter the desired number of events attended: '))
             
@@ -139,7 +146,11 @@ def main():
 
         elif choice2 == '3':
             students = load_students(students_file)
+            
             eventnames = list(set(student.eventname for student in students.values()))
+            if not eventnames:
+                    print('No Events found please add an event')
+                    continue
             print('Existing event names:')
             for event in eventnames:
                 print(event)
