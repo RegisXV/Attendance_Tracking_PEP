@@ -61,7 +61,14 @@ def main():
     files = list_files(directory)
     semester_list = list_semesters(semester_directory)
     while (semester_selected) != '1':
-        semester= input('Insert the name of the semester (e.g. Fall 2021): ')
+        
+        if not semester_list:
+            print('No semesters found please create a new semester')
+        else:
+            print('Existing semesters:')
+            for idx, semester in enumerate(semester_list):
+                print(f"{idx + 1}: {semester}")
+        semester= input('Insert a semester (e.g. Fall 2021): ')
         students_file = os.path.join(semester_directory, f'{semester}_Students.json')
         if not os.path.exists(students_file):
             with open(students_file, 'w') as f:
