@@ -29,6 +29,9 @@ class Student:
 def list_files(directory):
     return [f for f in os.listdir(directory) if f.endswith('.xlsx')]
 
+def list_semesters(semester_directory):
+    return [f for f in os.listdir(semester_directory) if f.endswith('.json')]
+
 def load_students(filename):
     if os.path.exists(filename) and os.path.getsize(filename) > 0:  # Check if file is not empty
         with open(filename, 'r') as f:
@@ -44,17 +47,32 @@ def save_students(filename, students):
 def main():
     base_dir = os.path.dirname(os.path.abspath(sys.executable if getattr(sys, 'frozen', False) else __file__))
     directory = os.path.join(base_dir, 'Attendance_Sheets')
-    students_file = os.path.join(base_dir, 'students.json')
+    semester_directory = os.path.join(base_dir, 'Semesters')
 
     if not os.path.exists(directory):
         os.makedirs(directory)
         print(f'Attendance_Sheets folder created at: {directory}')
-    
-    if not os.path.exists(students_file):
-        with open(students_file, 'w') as f:
-            json.dump({}, f)
 
+    if not os.path.exists(semester_directory): 
+        os.makedirs(semester_directory)
+        print(f'Semesters folder created at: {semester_directory}')
+    
+    semester_selected = None
     files = list_files(directory)
+    semester_list = list_semesters(semester_directory)
+    while (semester_selected) != '1':
+        semester= input('Insert the name of the semester (e.g. Fall 2021): ')
+        students_file = os.path.join(semester_directory, f'{semester}_Students.json')
+        if not os.path.exists(students_file):
+            with open(students_file, 'w') as f:
+                json.dump({}, f)
+            print(f'File created at: {students_file} initializaing program.')
+            semester_selected = '1'
+        else:
+            semester_selected = '1'
+            print(f'{semester} has been selected initializing program.')
+
+
     choice2 = None
     while (choice2) != '4':
         choice2 = input('Press 1 to insert data into an event, press 2 to get final tallies for event, press 3 to list event names, 4 to exit the program (1/2/3/4): ')
