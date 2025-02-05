@@ -56,33 +56,49 @@ def main():
     if not os.path.exists(semester_directory): 
         os.makedirs(semester_directory)
         print(f'Semesters folder created at: {semester_directory}')
+
     
     semester_selected = None
     files = list_files(directory)
     semester_list = list_semesters(semester_directory)
     while (semester_selected) != '1':
-        
-        if not semester_list:
-            print('No semesters found please create a new semester')
-        else:
+
+        Semester_Choice = input('Press 1 to select an existing semester, press 2 to create a new semester (1/2): ')
+
+        if Semester_Choice == '2':
+            semester= input('Insert a semester (e.g. Fall 2021): ')
+            students_file = os.path.join(semester_directory, f'{semester}_Students.json')
+            if not os.path.exists(students_file):
+                with open(students_file, 'w') as f:
+                    json.dump({}, f)
+                print(f'File created at: {students_file} initializaing program.')
+                semester_selected = '1'
+            else:
+                semester_selected = '1'
+                print(f'{semester} has been selected initializing program.')
+
+        elif Semester_Choice == '1':
+            if not semester_list:
+                print('No semesters found please create a new semester')
+                sys.exit()
             print('Existing semesters:')
             for idx, semester in enumerate(semester_list):
                 print(f"{idx + 1}: {semester}")
-        semester= input('Insert a semester (e.g. Fall 2021): ')
-        students_file = os.path.join(semester_directory, f'{semester}_Students.json')
-        if not os.path.exists(students_file):
-            with open(students_file, 'w') as f:
-                json.dump({}, f)
-            print(f'File created at: {students_file} initializaing program.')
-            semester_selected = '1'
-        else:
+            semester_choice = int(input('Select a semester by number: ')) - 1
+
+            if semester_choice < 0 or semester_choice >= len(semester_list):
+                print('Invalid choice')
+                continue
+
+            semester = semester_list[semester_choice]
+            students_file = os.path.join(semester_directory, f'{semester}')
             semester_selected = '1'
             print(f'{semester} has been selected initializing program.')
 
 
     choice2 = None
-    while (choice2) != '4':
-        choice2 = input('Press 1 to insert data into an event, press 2 to get final tallies for event, press 3 to list event names, 4 to exit the program (1/2/3/4): ')
+    while (choice2) != '5':
+        choice2 = input('Press 1 to insert data into an event, press 2 to get final tallies for event, press 3 to list event names, 4 To reset Attendance sheet folder, 5 to exit the program (1/2/3/4/5): ')
         
         if choice2 == '1':
             choice3 = input('Press 1 to add a new event, press 2 to add to an existing event (1/2): ')
@@ -130,7 +146,7 @@ def main():
             sheet = wb.active
 
             # Print the values of the first row
-            for row in sheet.iter_rows(min_row=6, min_col=1, max_col=9):
+            for row in sheet.iter_rows(min_row=7, min_col=1, max_col=9):
                 if all(cell.value is None for cell in row):
                     break
                 student_id = row[0].value
@@ -181,6 +197,22 @@ def main():
                 print(event)
 
         elif choice2 == '4':
+            Reset=input('Are you sure you want to reset the Attendance_Sheets folder? (Y/N): ')
+            if Reset == 'Y':
+                Reset1=input('Please Type Reset with capital R to confirm: ')
+                if Reset1 == 'Reset':
+                    for file in os.listdir(directory):
+                        file_path = os.path.join(directory, file)
+                        os.remove(file_path)
+                    print('All files removed from Attendance_Sheets folder')
+                elif Reset1 != 'Reset':
+                    print('Reset not confirmed')
+                    continue
+            elif Reset == 'N':
+                print('Reset not confirmed')
+                continue
+
+        elif choice2 == '5':
             sys.exit()
 if __name__ == '__main__':
     main()
