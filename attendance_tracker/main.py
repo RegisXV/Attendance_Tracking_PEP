@@ -5,10 +5,11 @@ import json
 from collections import defaultdict
 
 class Student:
-    def __init__(self, firstname, lastname, student_id, eventname, tally=0):
+    def __init__(self, firstname, lastname, student_id, studentemail, eventname, tally=0):
         self.firstname = firstname
         self.lastname = lastname
         self.student_id = str(student_id)
+        self.studentemail = studentemail
         self.eventname = eventname
         self.tally = tally
 
@@ -17,13 +18,14 @@ class Student:
             'firstname': self.firstname,
             'lastname': self.lastname,
             'student_id': self.student_id,
+            'studentemail': self.studentemail,
             'eventname': self.eventname,
             'tally': self.tally
         }
 
     @staticmethod
     def from_dict(data):
-        return Student(data['firstname'], data['lastname'], data['student_id'], data['eventname'], data['tally'])
+        return Student(data['firstname'], data['lastname'], data['student_id'], data['studentemail'], data['eventname'], data['tally'])
 
 
 def list_files(directory):
@@ -96,9 +98,13 @@ def main():
             print(f'{semester} has been selected initializing program.')
 
 
-    choice2 = None
-    while (choice2) != '5':
-        choice2 = input('Press 1 to insert data into an event, press 2 to get final tallies for event, press 3 to list event names, 4 To reset Attendance sheet folder, 5 to exit the program (1/2/3/4/5): ')
+    while True:
+        files = list_files(directory)
+        if not files:
+            print(f'No files found in {directory}. Please add Excel files to this folder and run the program again.')
+            sys.exit()
+
+        choice2 = input('Press 1 to insert data into an event, press 2 to get final tallies for event, press 3 to list event names, press 4 to reset Attendance sheet folder, press 5 to exit the program (1/2/3/4/5): ')
         
         if choice2 == '1':
             choice3 = input('Press 1 to add a new event, press 2 to add to an existing event (1/2): ')
@@ -123,11 +129,10 @@ def main():
             elif choice3 == '1':
                 eventname = input('Enter the name of the new event: ')
 
-            # Check if the file exists
+            files = list_files(directory)
             if not files:
-                print('No files found please add excel files to the Attendance_Sheets folder')
-                delay = input('Press The Enter Key to exit the program')
-                sys.exit()
+                print(f'No files found in {directory}. Please add Excel files to this folder and run the program again.')
+                sys.exit() 
 
             print('Available files:')
             for idx, file in enumerate(files):
@@ -149,14 +154,15 @@ def main():
             for row in sheet.iter_rows(min_row=7, min_col=1, max_col=9):
                 if all(cell.value is None for cell in row):
                     break
-                student_id = row[0].value
-                firstname = row[1].value
-                lastname = row[2].value
+                student_id = row[8].value
+                firstname = row[0].value
+                lastname = row[1].value
+                studentemail = row[2].value
 
                 if student_id and eventname:
                     key = (str(student_id), eventname)
                     if key not in students:
-                        students[key] = Student(firstname, lastname, student_id, eventname, 1)
+                        students[key] = Student(firstname, lastname, student_id, studentemail, eventname, 1)
                     else:
                         students[key].tally += 1
             
@@ -183,7 +189,7 @@ def main():
             
             for student in students.values():
                 if student.eventname == eventname and student.tally == tally1:
-                    print(f"{student.firstname} {student.lastname} ({student.student_id}): {student.tally} events")
+                    print(f"Name-{student.firstname} {student.lastname} ID-({student.student_id}) Email-({student.studentemail}): {student.tally} Events Attended")
 
         elif choice2 == '3':
             students = load_students(students_file)
